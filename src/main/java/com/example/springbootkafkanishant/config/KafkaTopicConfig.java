@@ -12,4 +12,9 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("tweetsTopic").build();
         //.partitions(2);
     }
+
+    public NewTopic tweetsTopicJSON() {
+        return TopicBuilder.name("tweetsTopicJSON").build();
+        //.partitions(2);
+    }
 }
