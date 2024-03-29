@@ -1,5 +1,5 @@
 package com.example.springbootkafkanishant;
-import com.example.springbootkafkanishant.kakfa.JsonKafkaConsumer;
+import com.example.springbootkafkanishant.spark.KafkaStreamProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationListener;
@@ -15,7 +15,7 @@ public class SpringbootKafkaNishantApplication implements ApplicationListener<Co
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         // This method will be called when the Spring application context is fully initialized
-        JsonKafkaConsumer jsonKafkaConsumer = new JsonKafkaConsumer();
+        KafkaStreamProcessor jsonKafkaConsumer = new KafkaStreamProcessor();
         try {
             jsonKafkaConsumer.consume();
         } catch (InterruptedException e) {

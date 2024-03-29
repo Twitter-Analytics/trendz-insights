@@ -1,4 +1,4 @@
-package com.example.springbootkafkanishant.kakfa;
+package com.example.springbootkafkanishant.spark;
 
 import com.example.springbootkafkanishant.payload.Tweet;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,18 +20,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
-public class JsonKafkaConsumer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducer.class);
+public class KafkaStreamProcessor {
+    // consumes tweets from Kafka using Spark Streaming
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaStreamProcessor.class);
 
     private String topic = "tweetsTopicJSON";
 
 
     public void consume() throws InterruptedException {
         Duration batchInterval = new Duration(5000); // 5000 milliseconds = 5 seconds
-        JavaStreamingContext streamingContext = new JavaStreamingContext("local[2]", "KafkaStreamingApp", batchInterval);
+        JavaStreamingContext streamingContext = new JavaStreamingContext("local[2]", "KafkaStreamingApp" , batchInterval);
 
         Collection<String> topics = Collections.singletonList(topic);
         Map<String, Object> kafkaParams = new HashMap<>();

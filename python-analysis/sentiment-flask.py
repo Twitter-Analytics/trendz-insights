@@ -2,9 +2,6 @@ from flask import Flask, request, jsonify
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 # Initializing Flask application
-import nltk
-nltk.download('vader_lexicon')
-
 app = Flask(__name__)
 
 # Initializing NLTK sentiment analyzer

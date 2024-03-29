@@ -1,8 +1,7 @@
 package com.example.springbootkafkanishant.controllers;
 
-import com.example.springbootkafkanishant.kakfa.KafkaProducer;
 import com.example.springbootkafkanishant.payload.Tweet;
-import com.example.springbootkafkanishant.kakfa.JsonKafkaProducer;
+import com.example.springbootkafkanishant.kakfa.Producer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +20,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 @EnableScheduling
 public class TweetFetcher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TweetFetcher.class);
 
-    private final JsonKafkaProducer kafkaProducer;
+    private final Producer kafkaProducer;
     private final List<Tweet> tweets = new ArrayList<>();
     private final AtomicInteger tweetIndex = new AtomicInteger(0);
 
-    public TweetFetcher(JsonKafkaProducer kafkaProducer) {
+    public TweetFetcher(Producer kafkaProducer) {
         this.kafkaProducer = kafkaProducer;
     }
 
