@@ -13,15 +13,15 @@ import org.springframework.stereotype.Service;
 public class JsonKafkaProducer {
 
     private  static final Logger LOGGER = LoggerFactory.getLogger(JsonKafkaProducer.class);
-    private KafkaTemplate<String , Tweet> kafkaTemplate;
-    public JsonKafkaProducer(KafkaTemplate<String, Tweet> kafkaTemplate) {
+    private KafkaTemplate<String , String> kafkaTemplate;
+    public JsonKafkaProducer(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public  void sendMessage(Tweet data) {
+    public  void sendMessage(String data) {
 
-        LOGGER.info(String.format("Message sent : %s" , data.toString()));
-        Message<Tweet> message = MessageBuilder
+//        LOGGER.info(String.format("Message sent : %s" , data.toString()));
+        Message<String> message = MessageBuilder
                 .withPayload(data)
                 .setHeader(KafkaHeaders.TOPIC , "tweetsTopicJSON")
                 .build();
