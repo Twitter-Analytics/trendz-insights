@@ -26,3 +26,13 @@ services:
       POSTGRES_DB: tweetsAnalysis
       POSTGRES_USER: nishant
       POSTGRES_PASSWORD: nishant
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: nishant@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    restart: always
