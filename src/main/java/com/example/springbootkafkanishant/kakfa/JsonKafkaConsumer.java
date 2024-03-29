@@ -20,12 +20,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class JsonKafkaConsumer {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducer.class);
 
     private String topic = "tweetsTopicJSON";
+
 
     public void consume() throws InterruptedException {
         Duration batchInterval = new Duration(5000); // 5000 milliseconds = 5 seconds
@@ -55,7 +57,6 @@ public class JsonKafkaConsumer {
                 return null; // Or handle the error as per your requirement
             }
         });
-
         // Process the received tweets
         stream.foreachRDD(rdd -> {
             rdd.foreach(tweet -> {
