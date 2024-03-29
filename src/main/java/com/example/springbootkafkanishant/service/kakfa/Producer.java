@@ -1,6 +1,5 @@
-package com.example.springbootkafkanishant.kakfa;
+package com.example.springbootkafkanishant.service.kakfa;
 
-import com.example.springbootkafkanishant.payload.Tweet;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.kafka.core.KafkaTemplate;

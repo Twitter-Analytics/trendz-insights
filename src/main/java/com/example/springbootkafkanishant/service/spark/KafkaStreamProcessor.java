@@ -1,6 +1,6 @@
-package com.example.springbootkafkanishant.spark;
+package com.example.springbootkafkanishant.service.spark;
 
-import com.example.springbootkafkanishant.payload.Tweet;
+import com.example.springbootkafkanishant.model.payload.Tweet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
@@ -13,9 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.stereotype.Component;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,15 +24,12 @@ import java.util.Map;
 
 @Component
 public class KafkaStreamProcessor {
-    // consumes tweets from Kafka using Spark Streaming
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaStreamProcessor.class);
-
     private String topic = "tweetsTopicJSON";
-
 
     public void consume() throws InterruptedException {
         Duration batchInterval = new Duration(5000); // 5000 milliseconds = 5 seconds
-        JavaStreamingContext streamingContext = new JavaStreamingContext("local[2]", "KafkaStreamingApp" , batchInterval);
+        JavaStreamingContext streamingContext = new JavaStreamingContext("local[2]", "KafkaStreamingApp", batchInterval);
 
         Collection<String> topics = Collections.singletonList(topic);
         Map<String, Object> kafkaParams = new HashMap<>();
@@ -48,27 +46,33 @@ public class KafkaStreamProcessor {
                 LocationStrategies.PreferConsistent(),
                 ConsumerStrategies.Subscribe(topics, kafkaParams)
         ).map(record -> {
-            // Deserialize the Kafka message into a Tweet object
             ObjectMapper mapper = new ObjectMapper();
             try {
                 return mapper.readValue(record.value().toString(), Tweet.class);
             } catch (Exception e) {
                 LOGGER.error("Error deserializing Kafka message into Tweet object", e);
-                return null; // Or handle the error as per your requirement
+                return null;
             }
         });
-        // Process the received tweets
-        stream.foreachRDD(rdd -> {
-            rdd.foreach(tweet -> {
-                if (tweet != null) {
-                    LOGGER.info(String.format("Message received: %s", tweet));
 
-                    try (PrintWriter writer = new PrintWriter(new FileWriter("/home/nishant/Documents/springboot-kafka-nishant/src/main/java/com/example/springbootkafkanishant/kakfa/tweets.txt", true))) {
-                        writer.println(tweet); // Write the tweet to the file
-                    } catch (IOException e) {
-                        LOGGER.info("Error writing tweet to file");
+        // Write data to PostgreSQL
+        stream.foreachRDD(rdd -> {
+            rdd.foreachPartition(partition -> {
+                try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/tweetsAnalysis", "nishant", "nishant")) {
+                    String insertQuery = "INSERT INTO tweets (tweet_id, tweet_content) VALUES (?, ?)";
+                    try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                        while (partition.hasNext()) {
+                            Tweet tweet = partition.next();
+                            if (tweet != null) {
+                                statement.setString(1, tweet.getTweet_id());
+                                statement.setString(2, tweet.getTweet());
+                                statement.addBatch();
+                            }
+                        }
+                        statement.executeBatch();
                     }
-                    // Process the tweet further here
+                } catch (SQLException e) {
+                    LOGGER.error("Error writing data to PostgreSQL", e);
                 }
             });
         });

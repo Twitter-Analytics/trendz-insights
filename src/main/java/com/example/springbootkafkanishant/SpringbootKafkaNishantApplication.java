@@ -1,5 +1,5 @@
 package com.example.springbootkafkanishant;
-import com.example.springbootkafkanishant.spark.KafkaStreamProcessor;
+import com.example.springbootkafkanishant.service.spark.KafkaStreamProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationListener;

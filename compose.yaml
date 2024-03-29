@@ -16,3 +16,13 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPIC: "my_topic:1:3"
+
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: tweetsAnalysis
+      POSTGRES_USER: nishant
+      POSTGRES_PASSWORD: nishant

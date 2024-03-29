@@ -1,7 +1,7 @@
-package com.example.springbootkafkanishant.controllers;
+package com.example.springbootkafkanishant.controller;
 
-import com.example.springbootkafkanishant.payload.Tweet;
-import com.example.springbootkafkanishant.kakfa.Producer;
+import com.example.springbootkafkanishant.model.payload.Tweet;
+import com.example.springbootkafkanishant.service.kakfa.Producer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

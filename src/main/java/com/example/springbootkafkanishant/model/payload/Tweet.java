@@ -1,4 +1,4 @@
-package com.example.springbootkafkanishant.payload;
+package com.example.springbootkafkanishant.model.payload;
 
 /*
  "just column ","created_at", "tweet_id", "tweet", "likes",
