@@ -1,6 +1,7 @@
 package com.example.springbootkafkanishant.service.spark;
 
 import com.example.springbootkafkanishant.model.payload.Tweet;
+import com.example.springbootkafkanishant.repository.TweetRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
@@ -26,6 +27,11 @@ import java.util.Map;
 public class KafkaStreamProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaStreamProcessor.class);
     private String topic = "tweetsTopicJSON";
+    private final TweetRepository tweetRepository;
+
+    public KafkaStreamProcessor(TweetRepository tweetRepository) {
+        this.tweetRepository = tweetRepository;
+    }
 
     public void consume() throws InterruptedException {
         Duration batchInterval = new Duration(5000); // 5000 milliseconds = 5 seconds
@@ -57,25 +63,28 @@ public class KafkaStreamProcessor {
 
         // Write data to PostgreSQL
         stream.foreachRDD(rdd -> {
-            rdd.foreachPartition(partition -> {
-                try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/tweetsAnalysis", "nishant", "nishant")) {
-                    String insertQuery = "INSERT INTO tweets (tweet_id, tweet_content) VALUES (?, ?)";
-                    try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-                        while (partition.hasNext()) {
-                            Tweet tweet = partition.next();
-                            if (tweet != null) {
-                                statement.setString(1, tweet.getTweet_id());
-                                statement.setString(2, tweet.getTweet());
-                                statement.addBatch();
-                            }
-                        }
-                        statement.executeBatch();
-                    }
-                } catch (SQLException e) {
-                    LOGGER.error("Error writing data to PostgreSQL", e);
-                }
-            });
+            rdd.foreach(tweetRepository::saveTweet);
         });
+//        stream.foreachRDD(rdd -> {
+//            rdd.foreachPartition(partition -> {
+//                try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/tweetsAnalysis", "nishant", "nishant")) {
+//                    String insertQuery = "INSERT INTO tweets (tweet_id, tweet_content) VALUES (?, ?)";
+//                    try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+//                        while (partition.hasNext()) {
+//                            Tweet tweet = partition.next();
+//                            if (tweet != null) {
+//                                statement.setString(1, tweet.getTweet_id());
+//                                statement.setString(2, tweet.getTweet());
+//                                statement.addBatch();
+//                            }
+//                        }
+//                        statement.executeBatch();
+//                    }
+//                } catch (SQLException e) {
+//                    LOGGER.error("Error writing data to PostgreSQL", e);
+//                }
+//            });
+//        });
 
         // Start the streaming context
         streamingContext.start();

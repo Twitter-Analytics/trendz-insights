@@ -1,4 +1,5 @@
 package com.example.springbootkafkanishant;
+import com.example.springbootkafkanishant.repository.TweetRepositoryImplementation;
 import com.example.springbootkafkanishant.service.spark.KafkaStreamProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,7 +16,8 @@ public class SpringbootKafkaNishantApplication implements ApplicationListener<Co
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         // This method will be called when the Spring application context is fully initialized
-        KafkaStreamProcessor jsonKafkaConsumer = new KafkaStreamProcessor();
+        TweetRepositoryImplementation tweetRepositoryImplementation = new TweetRepositoryImplementation();
+        KafkaStreamProcessor jsonKafkaConsumer = new KafkaStreamProcessor(tweetRepositoryImplementation);
         try {
             jsonKafkaConsumer.consume();
         } catch (InterruptedException e) {
