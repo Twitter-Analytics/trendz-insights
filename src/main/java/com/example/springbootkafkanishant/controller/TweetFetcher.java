@@ -1,8 +1,11 @@
+
 package com.example.springbootkafkanishant.controller;
 
 import com.example.springbootkafkanishant.model.payload.Tweet;
 import com.example.springbootkafkanishant.service.kakfa.Producer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -10,7 +13,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,25 +50,15 @@ public class TweetFetcher {
     }
 
     @PostConstruct
-    public void loadTweetsFromCsv() throws InterruptedException {
-//        LOGGER.info("Hello!");
-//        Thread.sleep(10000);
-        String filePath = "data1.csv";
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Split the CSV line by commas
-                String[] fields = line.split(",");
-
-                // Skip lines with fewer fields
-                if (fields.length < 9) {
-                    continue;
-                }
-
+    public void loadTweetsFromCsv() {
+        String filePath = "C:\\Users\\sarva\\OneDrive\\Desktop\\PICT\\java_boot_project\\project_inc\\kafka-pub-sub\\data1.csv";
+        try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
+            String[] line;
+            while ((line = reader.readNext()) != null) {
                 // Create a Tweet object from the CSV fields and add it to the list
-                tweets.add(getTweet(fields));
+                tweets.add(getTweet(line));
             }
-        } catch (IOException e) {
+        } catch (IOException | CsvValidationException e) {
             e.printStackTrace();
         }
     }
@@ -84,7 +76,7 @@ public class TweetFetcher {
                 String json = objectMapper.writeValueAsString(tweet);
 
                 // Send the JSON string to Kafka
-                LOGGER.info("Working hopefully ?!");
+                LOGGER.info("Sending tweet to Kafka: {}", json);
                 kafkaProducer.sendMessage(json);
             } catch (IOException e) {
                 e.printStackTrace();

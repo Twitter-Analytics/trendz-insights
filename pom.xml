@@ -103,6 +103,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.5.1</version> <!-- Use the latest version -->
+		</dependency>
+
+		<dependency>
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>
 			<version>3.0.16</version>
@@ -113,6 +119,11 @@
 			<artifactId>spark-mllib_2.12</artifactId>
 			<version>3.1.2</version>  </dependency>
 
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20210307</version>
+		</dependency>
 
 	</dependencies>
 	<build>

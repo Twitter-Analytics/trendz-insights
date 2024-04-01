@@ -1,8 +1,13 @@
+
 from flask import Flask, request, jsonify
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import logging
 
-# Initializing Flask application
 app = Flask(__name__)
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Initializing NLTK sentiment analyzer
 sid = SentimentIntensityAnalyzer()
@@ -10,22 +15,22 @@ sid = SentimentIntensityAnalyzer()
 # Route for predicting sentiment
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment():
-    # Getting text data from request
-    text = request.json['text']
+    try:
+        # Getting text data from request
+        text = request.json['text']
 
-    # Analyzing sentiment
-    sentiment_scores = sid.polarity_scores(text)
+        # Validate input data
+        if not text:
+            raise ValueError("Text data is missing")
 
-    # Determining sentiment label based on compound score
-    if sentiment_scores['compound'] >= 0.05:
-        sentiment_label = 'Positive'
-    elif sentiment_scores['compound'] <= -0.05:
-        sentiment_label = 'Negative'
-    else:
-        sentiment_label = 'Neutral'
+        # Analyzing sentiment
+        sentiment_scores = sid.polarity_scores(text)
 
-    # Returning the result
-    return jsonify({'sentiment': sentiment_label , 'score' : sentiment_scores['compound']})
+        # Returning the sentiment score
+        return jsonify(sentiment_scores['compound'])
+    except Exception as e:
+        logger.error(f"Error predicting sentiment: {str(e)}")
+        return jsonify({'error': 'An error occurred while predicting sentiment'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

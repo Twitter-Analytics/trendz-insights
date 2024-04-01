@@ -1,6 +1,7 @@
 package com.example.springbootkafkanishant.service.spark;
 
-import org.apache.spark.ml.feature.*;
+import org.apache.spark.ml.feature.Tokenizer;
+import org.apache.spark.ml.feature.StopWordsRemover;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -22,9 +23,8 @@ public class HourlyTrendsCalculator {
     private static final Logger LOGGER = LoggerFactory.getLogger(HourlyTrendsCalculator.class);
 
     @Scheduled(fixedDelay = 120000) // Execute every 2 minutes (120000 milliseconds)
-    public void calculateTrends() { // Removed static keyword from method signature
-        // Create SparkSession
-        LOGGER.info("HELLO I am in Calculate");
+    public void calculateTrends() {
+        LOGGER.info("Calculating hourly trends...");
 
         // Define JDBC connection properties
         String url = "jdbc:postgresql://localhost:5432/tweetsAnalysis";
@@ -41,10 +41,10 @@ public class HourlyTrendsCalculator {
                 "AND to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') < (TIMESTAMP '" + sampleCreatedAt + "' + INTERVAL '1 hour')";
 
         // Connect to PostgreSQL and load data for a specific hour
-        Dataset<Row> tweetDF = sparkSession.read() // Use sparkSession instead of spark
+        Dataset<Row> tweetDF = sparkSession.read()
                 .format("jdbc")
                 .option("url", url)
-                .option("dbtable", "(" + sqlQuery + ") as tweets")  // Subquery to filter data for the specific hour
+                .option("dbtable", "(" + sqlQuery + ") as tweets")
                 .option("user", user)
                 .option("password", password)
                 .load();
@@ -53,24 +53,30 @@ public class HourlyTrendsCalculator {
         Tokenizer tokenizer = new Tokenizer().setInputCol("tweet").setOutputCol("words");
         Dataset<Row> wordsDF = tokenizer.transform(tweetDF);
 
-        // Remove stop words
+        // Remove stop words from each tweet
         StopWordsRemover remover = new StopWordsRemover()
                 .setInputCol("words")
                 .setOutputCol("filteredWords");
-
         Dataset<Row> filteredWordsDF = remover.transform(wordsDF);
 
         // Count the occurrence of each word
         Dataset<Row> wordCounts = filteredWordsDF
-                .select(org.apache.spark.sql.functions.explode(org.apache.spark.sql.functions.col("filteredWords")).as("word")) // Explode the array of words into separate rows
+                .select(org.apache.spark.sql.functions.explode(org.apache.spark.sql.functions.col("filteredWords")).as("word"))
                 .groupBy("word")
                 .count()
-                .orderBy(org.apache.spark.sql.functions.col("count").desc()); // Order by count in descending order
+                .orderBy(org.apache.spark.sql.functions.col("count").desc())
+                .limit(10);
 
-        // Show the most frequent words
-        wordCounts.show(false);
+        // Load stop words into a DataFrame
+        Dataset<Row> stopWordsDF = sparkSession.read().text("C:\\Users\\sarva\\OneDrive\\Desktop\\PICT\\java_boot_project\\project_inc\\kafka-pub-sub\\stopwords.txt").toDF("stopword");
 
+        // Remove stop words from word counts
+        Dataset<Row> filteredWordCounts = wordCounts
+                .join(stopWordsDF, wordCounts.col("word").equalTo(stopWordsDF.col("stopword")), "left_anti");
+
+        // Show the most frequent non-stop words
+        filteredWordCounts.show(false);
+
+        // Now you can push this filteredWordCounts DataFrame to PostgreSQL or perform further analysis
     }
-    sparkSession.stop(); // Stop the Spark session
-
 }

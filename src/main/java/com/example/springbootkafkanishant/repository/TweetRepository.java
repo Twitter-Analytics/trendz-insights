@@ -5,5 +5,5 @@ import scala.Serializable;
 
 
 public interface TweetRepository extends Serializable {
-    void saveTweet(Tweet tweet);
+    void saveTweetAndSentiment(Tweet tweet , String sentiment);
 }
