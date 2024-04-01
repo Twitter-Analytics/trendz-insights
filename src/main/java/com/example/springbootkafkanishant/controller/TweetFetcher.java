@@ -51,7 +51,7 @@ public class TweetFetcher {
     public void loadTweetsFromCsv() throws InterruptedException {
 //        LOGGER.info("Hello!");
 //        Thread.sleep(10000);
-        String filePath = "/home/nishant/Desktop/data1.csv";
+        String filePath = "data1.csv";
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {

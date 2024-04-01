@@ -36,7 +36,7 @@ public class TweetRepositoryImplementation implements TweetRepository {
                 statement.executeUpdate();
             }
         } catch (SQLException | ParseException e) {
-            LOGGER.error("Error saving tweet to PostgreSQL", e);
+            LOGGER.error("Error saving tweet to PostgresSQL", e);
         }
     }
 }
