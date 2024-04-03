@@ -51,7 +51,7 @@ public class TweetFetcher {
 
     @PostConstruct
     public void loadTweetsFromCsv() {
-        String filePath = "C:\\Users\\sarva\\OneDrive\\Desktop\\PICT\\java_boot_project\\project_inc\\kafka-pub-sub\\data1.csv";
+        String filePath = "/home/nishant/Desktop/data1.csv";
         try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
             String[] line;
             while ((line = reader.readNext()) != null) {
