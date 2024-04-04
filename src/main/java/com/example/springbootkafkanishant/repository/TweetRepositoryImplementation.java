@@ -1,8 +1,11 @@
 package com.example.springbootkafkanishant.repository;
 
 import com.example.springbootkafkanishant.model.payload.Tweet;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.spark.sql.Row;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -36,6 +39,22 @@ public class TweetRepositoryImplementation implements TweetRepository {
         } catch (SQLException | ParseException e) {
             LOGGER.error("Error writing data to PostgreSQL", e);
         }
+    }
+
+    public Dataset<Row> loadTweetsForHour(SparkSession sparkSession, String url, String user, String password, String sampleCreatedAt) {
+        // Construct SQL query to select tweets for the hour of the sample created_at
+        String sqlQuery = "SELECT * FROM tweet " +
+                "WHERE to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') >= '" + sampleCreatedAt + "' " +
+                "AND to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') < (TIMESTAMP '" + sampleCreatedAt + "' + INTERVAL '1 hour')";
+
+        // Connect to PostgreSQL and load data for a specific hour
+        return sparkSession.read()
+                .format("jdbc")
+                .option("url", url)
+                .option("dbtable", "(" + sqlQuery + ") as tweets")
+                .option("user", user)
+                .option("password", password)
+                .load();
     }
 
 }

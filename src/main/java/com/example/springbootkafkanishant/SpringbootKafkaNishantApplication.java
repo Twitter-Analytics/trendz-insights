@@ -1,5 +1,7 @@
 package com.example.springbootkafkanishant;
 
+import com.example.springbootkafkanishant.repository.TrendRepositaryImplementaion;
+import com.example.springbootkafkanishant.repository.TrendRepository;
 import com.example.springbootkafkanishant.repository.TweetRepositoryImplementation;
 import com.example.springbootkafkanishant.service.spark.HourlyTrendsCalculator;
 import com.example.springbootkafkanishant.service.spark.KafkaStreamProcessor;
@@ -24,13 +26,14 @@ public class SpringbootKafkaNishantApplication implements ApplicationListener<Co
     public void onApplicationEvent(ContextRefreshedEvent event) {
         // This method will be called when the Spring application context is fully initialized
         TweetRepositoryImplementation tweetRepositoryImplementation = new TweetRepositoryImplementation();
-
+        TrendRepositaryImplementaion trendRepositaryImplementaion = new TrendRepositaryImplementaion();
         KafkaStreamProcessor jsonKafkaConsumer = new KafkaStreamProcessor(sparkSession , tweetRepositoryImplementation);
-        HourlyTrendsCalculator hourlyTrendsCalculator = new HourlyTrendsCalculator(sparkSession);
-        try {
-            jsonKafkaConsumer.consume();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        HourlyTrendsCalculator hourlyTrendsCalculator = new HourlyTrendsCalculator(sparkSession , tweetRepositoryImplementation , trendRepositaryImplementaion);
+//        try {
+//
+//            jsonKafkaConsumer.consume();
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }

@@ -63,7 +63,7 @@ public class TweetFetcher {
         }
     }
 
-    @Scheduled(fixedDelay = 10000) // Execute every 10 seconds
+//    @Scheduled(fixedDelay = 1000) // Execute every 10 seconds
     public void sendTweetToKafka() {
         int index = tweetIndex.getAndIncrement();
         if (index < tweets.size()) {

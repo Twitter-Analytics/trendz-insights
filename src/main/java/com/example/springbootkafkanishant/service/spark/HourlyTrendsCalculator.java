@@ -1,5 +1,8 @@
 package com.example.springbootkafkanishant.service.spark;
 
+import com.example.springbootkafkanishant.model.payload.Trend;
+import com.example.springbootkafkanishant.repository.TrendRepository;
+import com.example.springbootkafkanishant.repository.TweetRepository;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.ml.feature.Tokenizer;
 import org.apache.spark.ml.feature.StopWordsRemover;
@@ -20,15 +23,18 @@ import java.util.List;
 @Component
 public class HourlyTrendsCalculator {
     private final SparkSession sparkSession;
-
+    private final TweetRepository tweetRepository;
+    private final TrendRepository trendRepository;
     @Autowired
-    public HourlyTrendsCalculator(SparkSession sparkSession) {
+    public HourlyTrendsCalculator(SparkSession sparkSession , TweetRepository tweetRepository , TrendRepository trendRepository) {
         this.sparkSession = sparkSession;
+        this.tweetRepository = tweetRepository;
+        this.trendRepository = trendRepository;
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HourlyTrendsCalculator.class);
 
-    @Scheduled(fixedDelay = 120000) // Execute every 2 minutes (120000 milliseconds)
+    @Scheduled(fixedDelay = 600000) // Execute every 2 minutes (120000 milliseconds)
     public void calculateTrends() {
         LOGGER.info("Calculating hourly trends...");
 
@@ -38,22 +44,10 @@ public class HourlyTrendsCalculator {
         String user = "nishant";
         String password = "nishant";
 
-        // Define query for a specific hour
+//        // Define query for a specific hour
         String sampleCreatedAt = "2020-11-07 00:00:00+05:30";
 
-        // Construct SQL query to select tweets for the hour of the sample created_at
-        String sqlQuery = "SELECT * FROM tweet " +
-                "WHERE to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') >= '" + sampleCreatedAt + "' " +
-                "AND to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') < (TIMESTAMP '" + sampleCreatedAt + "' + INTERVAL '1 hour')";
-
-        // Connect to PostgreSQL and load data for a specific hour
-        Dataset<Row> tweetDF = sparkSession.read()
-                .format("jdbc")
-                .option("url", url)
-                .option("dbtable", "(" + sqlQuery + ") as tweets")
-                .option("user", user)
-                .option("password", password)
-                .load();
+        Dataset<Row> tweetDF = tweetRepository.loadTweetsForHour(sparkSession , url , user , password , sampleCreatedAt);
 
         // Tokenize the tweet text
         Tokenizer tokenizer = new Tokenizer().setInputCol("tweet").setOutputCol("words");
@@ -71,7 +65,7 @@ public class HourlyTrendsCalculator {
                 .groupBy("word")
                 .count()
                 .orderBy(org.apache.spark.sql.functions.col("count").desc())
-                .limit(10);
+                .limit(20);
 
         // Load stop words into a DataFrame
         Dataset<Row> stopWordsDF = sparkSession.read().text("/home/nishant/Documents/springboot-kafka-nishant/stopwords.txt").toDF("stopword");
@@ -89,19 +83,24 @@ public class HourlyTrendsCalculator {
         for (String trend : trendList) {
             System.out.println(trend);
             Dataset<Row> filteredTweets = tweetDF.filter(tweetDF.col("tweet").contains(trend));
-            performSentimentAnalysis(filteredTweets , trend);
+            performSentimentAnalysis(filteredTweets , trend , sampleCreatedAt);
         }
 
         // Now you can push this filteredWordCounts DataFrame to PostgreSQL or perform further analysis
     }
 
-    public static void performSentimentAnalysis(Dataset<Row> tweetDF, String name) {
+    public void performSentimentAnalysis(Dataset<Row> tweetDF, String name , String hour) {
         tweetDF = tweetDF.withColumn("sentiment", tweetDF.col("sentiment").cast(DataTypes.FloatType));
 
         tweetDF = tweetDF.filter(tweetDF.col("sentiment").isNotNull());
 
         // Calculate average sentiment
-        double avgSentiment = tweetDF.selectExpr("avg(sentiment)").collectAsList().get(0).getDouble(0);
+        double avgSentiment = 0;
+        List<Row> rows = tweetDF.selectExpr("avg(sentiment)").collectAsList();
+        if (!rows.isEmpty()) {
+             avgSentiment = rows.get(0).getDouble(0);
+            // Further processing using avgSentiment
+        }
         System.out.println("Average sentiment: " + avgSentiment + "\n");
 
         // Find the top 2 most positive and negative tweets
@@ -125,34 +124,27 @@ public class HourlyTrendsCalculator {
         System.out.println(tableBuilder.toString());
 
         // Store data in the database
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/tweetsAnalysis", "nishant", "nishant")) {
-            System.out.println("Pushing trends in trend!");
-            String sql = "INSERT INTO trend (name, sentimentScore, positive1, positive2, negative1, negative2) VALUES (?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, name);
-                statement.setDouble(2, avgSentiment);
-
-                if (!topPositiveTweets.isEmpty() && topPositiveTweets.count() > 1) {
-                    statement.setString(3, topPositiveTweets.collectAsList().get(0).getString(1));
-                    statement.setString(4, topPositiveTweets.collectAsList().get(1).getString(1));
-                } else {
-                    statement.setNull(3, Types.VARCHAR);
-                    statement.setNull(4, Types.VARCHAR);
-                }
-
-                if (!topNegativeTweets.isEmpty() && topNegativeTweets.count() > 1) {
-                    statement.setString(5, topNegativeTweets.collectAsList().get(0).getString(1));
-                    statement.setString(6, topNegativeTweets.collectAsList().get(1).getString(1));
-                } else {
-                    statement.setNull(5, Types.VARCHAR);
-                    statement.setNull(6, Types.VARCHAR);
-                }
-
-                statement.executeUpdate();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Trend trend = new Trend();
+        trend.setName(name);
+        trend.setHour(hour);
+        trend.setSentimentScore(String.valueOf(avgSentiment));
+        if (!topPositiveTweets.isEmpty() && topPositiveTweets.count() > 1) {
+            trend.setPositive1(topPositiveTweets.collectAsList().get(0).getString(1));
+            trend.setPositive2(topPositiveTweets.collectAsList().get(1).getString(1));
+        } else {
+            trend.setPositive1("");
+            trend.setPositive2("");
         }
+        if (!topNegativeTweets.isEmpty() && topNegativeTweets.count() > 1) {
+            trend.setNegative1(topNegativeTweets.collectAsList().get(0).getString(1));
+            trend.setNegative2(topNegativeTweets.collectAsList().get(1).getString(1));
+        } else {
+            trend.setNegative1("");
+            trend.setNegative2("");
+        }
+
+        trendRepository.saveTrend(trend);
+
     }
 
 

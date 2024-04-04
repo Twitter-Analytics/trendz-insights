@@ -26,6 +26,8 @@ services:
       POSTGRES_DB: tweetsAnalysis
       POSTGRES_USER: nishant
       POSTGRES_PASSWORD: nishant
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
@@ -36,3 +38,9 @@ services:
       PGADMIN_DEFAULT_EMAIL: nishant@gmail.com
       PGADMIN_DEFAULT_PASSWORD: password
     restart: always
+    volumes:
+      - pgadmindata:/var/lib/pgadmin
+
+volumes:
+  pgdata:
+  pgadmindata:
