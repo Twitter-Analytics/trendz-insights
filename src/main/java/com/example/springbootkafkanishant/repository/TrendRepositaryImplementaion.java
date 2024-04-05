@@ -40,9 +40,10 @@ public class TrendRepositaryImplementaion implements TrendRepository{
         trends.add(trend1);
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/tweetsAnalysis", "nishant", "nishant")) {
             System.out.println(hour);
-            String sqlQuery = "SELECT * FROM trend " +
-                    "WHERE to_timestamp(hour, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') >= '" + hour + "' " +
-                    "AND to_timestamp(hour, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') < (TIMESTAMP '" + hour + "' + INTERVAL '1 hour')";
+//            String sqlQuery = "SELECT * FROM trend " +
+//                    "WHERE to_timestamp(hour, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') >= '" + hour + "' " +
+//                    "AND to_timestamp(hour, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') < (TIMESTAMP '" + hour + "' + INTERVAL '1 hour')";
+            String sqlQuery = "SELECT * FROM trend";
             try (PreparedStatement statement = connection.prepareStatement(sqlQuery)) {
 //                statement.setString(1, hour);
 //                statement.setString(2, hour);

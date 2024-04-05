@@ -49,9 +49,9 @@ public class TweetFetcher {
         return tweet;
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void loadTweetsFromCsv() {
-        String filePath = "/home/nishant/Desktop/data1.csv";
+        String filePath = "/home/nishant/Desktop/temp/data3.csv";
         try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
             String[] line;
             while ((line = reader.readNext()) != null) {
@@ -63,7 +63,7 @@ public class TweetFetcher {
         }
     }
 
-//    @Scheduled(fixedDelay = 1000) // Execute every 10 seconds
+//    @Scheduled(fixedDelay = 500) // Execute every 10 seconds
     public void sendTweetToKafka() {
         int index = tweetIndex.getAndIncrement();
         if (index < tweets.size()) {

@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.apache.commons.text.TextStringBuilder;
 
+import javax.annotation.PostConstruct;
 import java.sql.*;
 import java.util.List;
 
@@ -34,7 +35,8 @@ public class HourlyTrendsCalculator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HourlyTrendsCalculator.class);
 
-    @Scheduled(fixedDelay = 600000) // Execute every 2 minutes (120000 milliseconds)
+    @PostConstruct
+//    @Scheduled(fixedDelay = 600000) // Execute every 2 minutes (120000 milliseconds)
     public void calculateTrends() {
         LOGGER.info("Calculating hourly trends...");
 
@@ -45,7 +47,7 @@ public class HourlyTrendsCalculator {
         String password = "nishant";
 
 //        // Define query for a specific hour
-        String sampleCreatedAt = "2020-11-07 00:00:00+05:30";
+        String sampleCreatedAt = "2020-11-07 00:04:00+05:30";
 
         Dataset<Row> tweetDF = tweetRepository.loadTweetsForHour(sparkSession , url , user , password , sampleCreatedAt);
 
