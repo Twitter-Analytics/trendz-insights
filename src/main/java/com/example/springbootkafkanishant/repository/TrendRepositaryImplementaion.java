@@ -13,7 +13,7 @@ public class TrendRepositaryImplementaion implements TrendRepository{
     public void saveTrend(Trend trend) {
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/tweetsAnalysis", "nishant", "nishant")) {
             System.out.println("Pushing trends in trend!");
-            String sql = "INSERT INTO trend (name, sentimentScore, positive1, positive2, negative1, negative2, hour) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO trends (name, sentimentScore, positive1, positive2, negative1, negative2, hour) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, trend.getName());
                 statement.setString(2, trend.getSentimentScore());
@@ -35,18 +35,14 @@ public class TrendRepositaryImplementaion implements TrendRepository{
     public List<Trend> getAllTrendsForNextHour(String hour) {
 
         List<Trend> trends = new ArrayList<>();
-        Trend trend1 = new Trend();
-        trend1.setHour(hour);
-        trends.add(trend1);
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/tweetsAnalysis", "nishant", "nishant")) {
-            System.out.println(hour);
-//            String sqlQuery = "SELECT * FROM trend " +
-//                    "WHERE to_timestamp(hour, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') >= '" + hour + "' " +
-//                    "AND to_timestamp(hour, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') < (TIMESTAMP '" + hour + "' + INTERVAL '1 hour')";
-            String sqlQuery = "SELECT * FROM trend";
+            String sqlQuery = "SELECT * FROM trend " +
+                    "WHERE to_timestamp(hour, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') >= '" + hour + "' " +
+                    "AND to_timestamp(hour, 'YYYY-MM-DD HH24:MI:SS+TZH:TZM') < (TIMESTAMP '" + hour + "' + INTERVAL '1 hour')";
+//            String sqlQuery = "SELECT * FROM trend";
             try (PreparedStatement statement = connection.prepareStatement(sqlQuery)) {
-//                statement.setString(1, hour);
-//                statement.setString(2, hour);
+                statement.setString(1, hour);
+                statement.setString(2, hour);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
                         Trend trend = new Trend();

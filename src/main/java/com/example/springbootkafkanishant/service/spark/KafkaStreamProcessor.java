@@ -42,39 +42,28 @@ public class KafkaStreamProcessor implements Serializable {
         this.tweetRepository = tweetRepository;
     }
 
-    // Method to send HTTP request to Flask API for sentiment analysis
+
     private String predictSentiment(String text) throws IOException {
         try {
-            // URL of your Flask API endpoint for sentiment analysis
             String apiUrl = "http://localhost:5000/predict_sentiment";
-
-            // Create URL object
             URL url = new URL(apiUrl);
-
-            // Open connection
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            // Set the request method
             con.setRequestMethod("POST");
-
-            // Set request headers
             con.setRequestProperty("Content-Type", "application/json");
             con.setDoOutput(true);
 
-            // Create JSON request body
+
             JSONObject requestBody = new JSONObject();
             requestBody.put("text", text);
 
-            // Write JSON request body to the connection
             try (OutputStream os = con.getOutputStream()) {
                 byte[] input = requestBody.toString().getBytes("utf-8");
                 os.write(input, 0, input.length);
             }
 
-            // Get response code
             int responseCode = con.getResponseCode();
 
-            // Read response
+
             StringBuilder response = new StringBuilder();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"))) {
@@ -84,12 +73,9 @@ public class KafkaStreamProcessor implements Serializable {
                     }
                 }
             } else {
-                // Handle non-OK response code
-                // For example:
                 LOGGER.error("HTTP request failed with response code: " + responseCode);
             }
 
-            // Return sentiment prediction
             return response.toString();
         } catch (IOException e) {
             LOGGER.error("Error predicting sentiment: " + e.getMessage());
@@ -98,7 +84,7 @@ public class KafkaStreamProcessor implements Serializable {
     }
 
     public void consume() throws InterruptedException {
-        Duration batchInterval = new Duration(5000); // 5000 milliseconds = 5 seconds
+        Duration batchInterval = new Duration(5000); // 5 secs
         JavaStreamingContext streamingContext = new JavaStreamingContext(JavaSparkContext.fromSparkContext(sparkSession.sparkContext()), batchInterval);
 
         Collection<String> topics = Collections.singletonList(topic);
@@ -127,7 +113,7 @@ public class KafkaStreamProcessor implements Serializable {
             }
         });
 
-        // Process each tweet
+
         stream.foreachRDD(rdd -> {
             rdd.foreach(tweet -> {
                 if (tweet != null) {
@@ -141,10 +127,7 @@ public class KafkaStreamProcessor implements Serializable {
             });
         });
 
-        // Start the streaming context
         streamingContext.start();
-
-        // Wait for the termination of the context
         streamingContext.awaitTermination();
     }
 

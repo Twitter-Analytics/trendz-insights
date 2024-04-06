@@ -35,21 +35,20 @@ public class TweetFetcher {
     private static Tweet getTweet(String[] fields) {
         Tweet tweet = new Tweet();
         try {
-            tweet.setCreated_at(fields[1].trim()); // Assuming "created_at" is at index 1
-            tweet.setTweet_id(fields[2].trim()); // Assuming "tweet_id" is at index 2
-            tweet.setTweet(fields[3].trim()); // Assuming "tweet" is at index 3
-            tweet.setLikes(fields[4].trim()); // Assuming "likes" is at index 4
-            tweet.setRetweet_count(fields[5].trim()); // Assuming "retweet_count" is at index 5
-            tweet.setUser_id(fields[6].trim()); // Assuming "user_id" is at index 6
-            tweet.setUser_followers_count(fields[7].trim()); // Assuming "user_followers_count" is at index 7
-            tweet.setUser_location(fields[8].trim()); // Assuming "user_location" is at index 8
+            tweet.setCreated_at(fields[1].trim());
+            tweet.setTweet_id(fields[2].trim());
+            tweet.setTweet(fields[3].trim());
+            tweet.setRetweet_count(fields[5].trim());
+            tweet.setUser_id(fields[6].trim());
+            tweet.setUser_followers_count(fields[7].trim());
+            tweet.setUser_location(fields[8].trim());
         } catch (Exception e) {
             e.printStackTrace();
         }
         return tweet;
     }
 
-//    @PostConstruct
+    @PostConstruct
     public void loadTweetsFromCsv() {
         String filePath = "/home/nishant/Desktop/temp/data3.csv";
         try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
@@ -63,19 +62,14 @@ public class TweetFetcher {
         }
     }
 
-//    @Scheduled(fixedDelay = 500) // Execute every 10 seconds
+    @Scheduled(fixedDelay = 500) // Execute every 0.5 second
     public void sendTweetToKafka() {
         int index = tweetIndex.getAndIncrement();
         if (index < tweets.size()) {
-            // Get the next tweet from the list
             Tweet tweet = tweets.get(index);
-
-            // Convert the Tweet object to JSON
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
                 String json = objectMapper.writeValueAsString(tweet);
-
-                // Send the JSON string to Kafka
                 LOGGER.info("Sending tweet to Kafka: {}", json);
                 kafkaProducer.sendMessage(json);
             } catch (IOException e) {

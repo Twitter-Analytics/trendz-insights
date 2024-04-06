@@ -2,8 +2,8 @@ package com.example.springbootkafkanishant.model.payload;
 
 /*
  "just column ","created_at", "tweet_id", "tweet", "likes",
-//                            "retweet_count", "user_id", "user_followers_count", "user_location"
-* */
+ "retweet_count", "user_id", "user_followers_count", "user_location"
+*/
 public class Tweet {
     private String created_at , tweet_id , tweet , likes , retweet_count , user_id , user_followers_count , user_location;
 

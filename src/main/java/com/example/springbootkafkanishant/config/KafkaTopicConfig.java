@@ -7,11 +7,6 @@ import org.springframework.kafka.config.TopicBuilder;
 
 @Configuration
 public class KafkaTopicConfig {
-    @Bean
-    public NewTopic tweetsTopic() {
-        return TopicBuilder.name("tweetsTopic").build();
-        //.partitions(2);
-    }
 
     public NewTopic tweetsTopicJSON() {
         return TopicBuilder.name("tweetsTopicJSON").build();

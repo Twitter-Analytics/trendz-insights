@@ -12,7 +12,7 @@ public class SparkConfig {
     public SparkSession sparkSession() {
         SparkConf sparkConf = new SparkConf()
                 .setAppName("KafkaSparkStreamingETL")
-                .setMaster("local[6]"); // Use appropriate master URL for your deployment
+                .setMaster("local[6]");
         return SparkSession.builder()
                 .config(sparkConf)
                 .getOrCreate();

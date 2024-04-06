@@ -47,21 +47,17 @@ public class HourlyTrendsCalculator {
         String password = "nishant";
 
 //        // Define query for a specific hour
-        String sampleCreatedAt = "2020-11-07 00:04:00+05:30";
+        String sampleCreatedAt = "2020-11-07 00:00:00+05:30";
 
         Dataset<Row> tweetDF = tweetRepository.loadTweetsForHour(sparkSession , url , user , password , sampleCreatedAt);
-
-        // Tokenize the tweet text
         Tokenizer tokenizer = new Tokenizer().setInputCol("tweet").setOutputCol("words");
         Dataset<Row> wordsDF = tokenizer.transform(tweetDF);
 
-        // Remove stop words from each tweet
         StopWordsRemover remover = new StopWordsRemover()
                 .setInputCol("words")
                 .setOutputCol("filteredWords");
         Dataset<Row> filteredWordsDF = remover.transform(wordsDF);
 
-        // Count the occurrence of each word
         Dataset<Row> wordCounts = filteredWordsDF
                 .select(org.apache.spark.sql.functions.explode(org.apache.spark.sql.functions.col("filteredWords")).as("word"))
                 .groupBy("word")
@@ -69,16 +65,12 @@ public class HourlyTrendsCalculator {
                 .orderBy(org.apache.spark.sql.functions.col("count").desc())
                 .limit(20);
 
-        // Load stop words into a DataFrame
         Dataset<Row> stopWordsDF = sparkSession.read().text("/home/nishant/Documents/springboot-kafka-nishant/stopwords.txt").toDF("stopword");
 
-        // Remove stop words from word counts
         Dataset<Row> trends = wordCounts
                 .join(stopWordsDF, wordCounts.col("word").equalTo(stopWordsDF.col("stopword")), "left_anti");
 
-        // Show the most frequent non-stop words
-        System.out.println("Hourly Trends:");
-        trends.show(false);
+
 
         List<String> trendList = trends.select("word").as(Encoders.STRING()).collectAsList();
 
@@ -88,7 +80,6 @@ public class HourlyTrendsCalculator {
             performSentimentAnalysis(filteredTweets , trend , sampleCreatedAt);
         }
 
-        // Now you can push this filteredWordCounts DataFrame to PostgreSQL or perform further analysis
     }
 
     public void performSentimentAnalysis(Dataset<Row> tweetDF, String name , String hour) {
@@ -96,36 +87,15 @@ public class HourlyTrendsCalculator {
 
         tweetDF = tweetDF.filter(tweetDF.col("sentiment").isNotNull());
 
-        // Calculate average sentiment
         double avgSentiment = 0;
         List<Row> rows = tweetDF.selectExpr("avg(sentiment)").collectAsList();
         if (!rows.isEmpty()) {
              avgSentiment = rows.get(0).getDouble(0);
-            // Further processing using avgSentiment
         }
-        System.out.println("Average sentiment: " + avgSentiment + "\n");
 
-        // Find the top 2 most positive and negative tweets
         Dataset<Row> topPositiveTweets = tweetDF.orderBy(tweetDF.col("sentiment").desc()).select("sentiment", "tweet").distinct().limit(2);
         Dataset<Row> topNegativeTweets = tweetDF.orderBy(tweetDF.col("sentiment")).select("sentiment", "tweet").distinct().limit(2);
 
-        // Format data into a table
-        TextStringBuilder tableBuilder = new TextStringBuilder();
-        tableBuilder.appendln("| Sentiment | Tweet                                   |");
-        tableBuilder.appendln("|-----------|-----------------------------------------|");
-
-        for (Row row : topPositiveTweets.collectAsList()) {
-            tableBuilder.append("| ").append(row.getFloat(0)).append("   | ").append(row.getString(1)).append(" |").appendNewLine();
-        }
-
-        for (Row row : topNegativeTweets.collectAsList()) {
-            tableBuilder.append("| ").append(row.getFloat(0)).append("   | ").append(row.getString(1)).append(" |").appendNewLine();
-        }
-
-        // Print the table
-        System.out.println(tableBuilder.toString());
-
-        // Store data in the database
         Trend trend = new Trend();
         trend.setName(name);
         trend.setHour(hour);
