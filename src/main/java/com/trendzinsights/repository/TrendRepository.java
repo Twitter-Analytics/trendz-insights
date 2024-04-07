@@ -1,6 +1,6 @@
-package com.example.springbootkafkanishant.repository;
+package com.trendzinsights.repository;
 
-import com.example.springbootkafkanishant.model.payload.Trend;
+import com.trendzinsights.model.payload.Trend;
 import scala.Serializable;
 
 import java.util.List;

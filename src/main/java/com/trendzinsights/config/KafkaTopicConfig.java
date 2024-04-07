@@ -1,4 +1,4 @@
-package com.example.springbootkafkanishant.config;
+package com.trendzinsights.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;

@@ -1,6 +1,6 @@
-package com.example.springbootkafkanishant.repository;
+package com.trendzinsights.repository;
 
-import com.example.springbootkafkanishant.model.payload.Trend;
+import com.trendzinsights.model.payload.Trend;
 import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.util.ArrayList;

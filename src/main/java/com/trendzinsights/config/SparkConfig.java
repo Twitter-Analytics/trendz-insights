@@ -1,4 +1,4 @@
-package com.example.springbootkafkanishant.config;
+package com.trendzinsights.config;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;

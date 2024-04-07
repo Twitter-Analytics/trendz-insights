@@ -1,4 +1,4 @@
-package com.example.springbootkafkanishant.model.payload;
+package com.trendzinsights.model.payload;
 
 /*
  "just column ","created_at", "tweet_id", "tweet", "likes",

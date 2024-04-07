@@ -1,4 +1,4 @@
-package com.example.springbootkafkanishant.model.payload;
+package com.trendzinsights.model.payload;
 
 public class Trend {
     private String name;

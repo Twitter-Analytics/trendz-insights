@@ -1,7 +1,7 @@
-package com.example.springbootkafkanishant.service.spark;
+package com.trendzinsights.service.spark;
 
-import com.example.springbootkafkanishant.model.payload.Tweet;
-import com.example.springbootkafkanishant.repository.TweetRepository;
+import com.trendzinsights.model.payload.Tweet;
+import com.trendzinsights.repository.TweetRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.json.JSONObject;
 
 @Component
 public class KafkaStreamProcessor implements Serializable {

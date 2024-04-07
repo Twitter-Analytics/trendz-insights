@@ -1,8 +1,8 @@
 
-package com.example.springbootkafkanishant.controller;
+package com.trendzinsights.controller;
 
-import com.example.springbootkafkanishant.model.payload.Tweet;
-import com.example.springbootkafkanishant.service.kakfa.Producer;
+import com.trendzinsights.model.payload.Tweet;
+import com.trendzinsights.service.kakfa.Producer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;

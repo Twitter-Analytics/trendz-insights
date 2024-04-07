@@ -1,4 +1,4 @@
-package com.example.springbootkafkanishant.service.kakfa;
+package com.trendzinsights.service.kakfa;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;

@@ -1,7 +1,7 @@
-package com.example.springbootkafkanishant.controller;
+package com.trendzinsights.controller;
 
-import com.example.springbootkafkanishant.model.payload.Trend;
-import com.example.springbootkafkanishant.repository.TrendRepository;
+import com.trendzinsights.model.payload.Trend;
+import com.trendzinsights.repository.TrendRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;

@@ -1,8 +1,8 @@
-package com.example.springbootkafkanishant.service.spark;
+package com.trendzinsights.service.spark;
 
-import com.example.springbootkafkanishant.model.payload.Trend;
-import com.example.springbootkafkanishant.repository.TrendRepository;
-import com.example.springbootkafkanishant.repository.TweetRepository;
+import com.trendzinsights.model.payload.Trend;
+import com.trendzinsights.repository.TrendRepository;
+import com.trendzinsights.repository.TweetRepository;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.ml.feature.Tokenizer;
 import org.apache.spark.ml.feature.StopWordsRemover;
@@ -13,12 +13,9 @@ import org.apache.spark.sql.types.DataTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.apache.commons.text.TextStringBuilder;
 
 import javax.annotation.PostConstruct;
-import java.sql.*;
 import java.util.List;
 
 @Component

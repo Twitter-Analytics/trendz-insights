@@ -1,6 +1,6 @@
-package com.example.springbootkafkanishant.repository;
+package com.trendzinsights.repository;
 
-import com.example.springbootkafkanishant.model.payload.Tweet;
+import com.trendzinsights.model.payload.Tweet;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;

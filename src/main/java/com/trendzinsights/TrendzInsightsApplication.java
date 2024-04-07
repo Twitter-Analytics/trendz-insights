@@ -1,10 +1,9 @@
-package com.example.springbootkafkanishant;
+package com.trendzinsights;
 
-import com.example.springbootkafkanishant.repository.TrendRepositaryImplementaion;
-import com.example.springbootkafkanishant.repository.TrendRepository;
-import com.example.springbootkafkanishant.repository.TweetRepositoryImplementation;
-import com.example.springbootkafkanishant.service.spark.HourlyTrendsCalculator;
-import com.example.springbootkafkanishant.service.spark.KafkaStreamProcessor;
+import com.trendzinsights.repository.TrendRepositaryImplementaion;
+import com.trendzinsights.repository.TweetRepositoryImplementation;
+import com.trendzinsights.service.spark.HourlyTrendsCalculator;
+import com.trendzinsights.service.spark.KafkaStreamProcessor;
 
 import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +13,10 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 @SpringBootApplication
-public class SpringbootKafkaNishantApplication implements ApplicationListener<ContextRefreshedEvent> {
+public class TrendzInsightsApplication implements ApplicationListener<ContextRefreshedEvent> {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringbootKafkaNishantApplication.class, args);
+        SpringApplication.run(TrendzInsightsApplication.class, args);
     }
 
     @Autowired
