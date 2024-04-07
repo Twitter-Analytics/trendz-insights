@@ -12,12 +12,12 @@
 	<groupId>com.example</groupId>
 	<artifactId>springboot-kafka-nishant</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>springboot-kafka-nishant</name>
+	<name>trendzinsights</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>9</java.version>
-		<maven.compiler.target>9</maven.compiler.target>
-		<maven.compiler.source>9</maven.compiler.source>
+		<java.version>11</java.version>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
 		<spark.version>3.2.1</spark.version>
 	</properties>
 	<dependencies>
