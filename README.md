@@ -18,7 +18,7 @@ Trendz-Insights is a project that aims to analyze trends on social media, partic
 - [PostgreSQL](https://www.postgresql.org/): for data storage.
 - [NLTK](https://www.nltk.org/) for sentiment generation.
 - [Spark MLlib](https://spark.apache.org/mllib/) for trend generation usng TF-IDF algoriCthm.
-## Final Power BI Dashboard Visualisation
+## Final Power BI Visualisation
 ![WhatsApp Image 2024-06-09 at 6 32 42 PM](https://github.com/Twitter-Analytics/trendz-insights/assets/100674772/1d01dc75-0bd9-4e34-a696-cbaeea93561e)
 
 
